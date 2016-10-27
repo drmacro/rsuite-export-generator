@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<generation-report>
+   <generation-parameters>
+      <outdir>export</outdir>
+      <!-- Number of top-level containers -->
+      <browseWidth>10</browseWidth>
+      <!-- Maximum depth of any container path -->
+      <browseDepth>5</browseDepth>
+      <!-- Maximum number of children per container -->
+      <maxContainerChildren>100</maxContainerChildren>
+      <!-- Maximum XML MOs to generate -->
+      <maxXmlMOs>10000</maxXmlMOs>
+      <!-- Maxmim non-XML MOs to generate -->
+      <maxBinaryMOs>10000</maxBinaryMOs>  
+   </generation-parameters>
+   <outputdir>file:/Users/ekimber/workspace_40/rsuite-export-generator/src/main/xsl/templates/export</outputdir>
+</generation-report>
