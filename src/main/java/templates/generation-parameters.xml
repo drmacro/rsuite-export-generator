@@ -9,6 +9,10 @@
   <maxContainerChildren>100</maxContainerChildren>
   <!-- Maximum XML MOs to generate -->
   <maxXmlMOs>10000</maxXmlMOs>
-  <!-- Maxmim non-XML MOs to generate -->
-  <maxBinaryMOs>10000</maxBinaryMOs>  
+  <!-- Maximum non-XML MOs to generate -->
+  <maxBinaryMOs>10000</maxBinaryMOs>
+  <!-- Maximum number of versions to create for versioned
+       MOs.
+    -->
+  <maxVersions>5</maxVersions>
 </generation-parameters>
