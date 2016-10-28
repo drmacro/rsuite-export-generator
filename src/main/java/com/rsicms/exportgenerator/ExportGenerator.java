@@ -1,6 +1,7 @@
 package com.rsicms.exportgenerator;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -21,11 +22,11 @@ public class ExportGenerator
 {
     private final GenerationParameters generationParameters;
 
-    static Log log = LogFactory.getLog(ExportGenerator.class);
+    private static Log log = LogFactory.getLog(ExportGenerator.class);
     private final File outdir;
-    int moid = 1000; // Start with MO 1000 so MO IDs look realistic.
+    private int moid = 1000; // Start with MO 1000 so MO IDs look realistic.
 
-    static ArrayList<String> wordList = new ArrayList<String>();
+    private static ArrayList<String> wordList = new ArrayList<String>();
 
     static {
         String wordsFilePath = "/resources/data-files/words.txt";
@@ -109,7 +110,7 @@ public class ExportGenerator
     }
 
     private void generateManagedObjects() throws Exception {
-        /**
+        /*
          * The managed object structure is:
          *
          * rsuite.content/
@@ -124,7 +125,7 @@ public class ExportGenerator
          *      999/ (1000 directories number 1-999
          */
 
-        /**
+        /*
          * Since RSuite tries to spread the MOs evenly over the directories, doing
          * a breadth-first traversal of the directories, rather than a depth-first.
          */
@@ -136,6 +137,7 @@ public class ExportGenerator
         }
 
         long progressCtr = 0;
+        long dotCtr = 0;
         // First make the top 100 directories.
         for (long i = 0; i < generationParameters.getMaxMoCount(); i++) {
             File topDir = getRandomDir(0, 999, mosDir);
@@ -150,9 +152,15 @@ public class ExportGenerator
 
             progressCtr++;
             if (progressCtr % 100 == 0) {
-                log.info(progressCtr + " MOs generated");
+                System.out.print(".");
+                dotCtr++;
+                if (dotCtr >= 60) {
+                    System.out.print("\n");
+                    dotCtr = 0;
+                }
             }
         }
+        System.out.print("\n");
 
 
     }
@@ -222,8 +230,8 @@ public class ExportGenerator
 
             writer.writeStartElement("versions");
             String moTagName = "topid";
-            for (int i = 0; i < versionSpecs.size(); i++) {
-                makeVersionEntry(writer, title, versionSpecs.get(i), moTagName, userName);
+            for (String versionSpec : versionSpecs) {
+                makeVersionEntry(writer, title, versionSpec, moTagName, userName);
             }
             writer.writeEndElement(); // versions
 
@@ -334,8 +342,8 @@ public class ExportGenerator
 
     /**
      *
-     * @param min
-     * @param max
+     * @param min Minimum number of words to get
+     * @param max Maximum number of words to get
      * @return A string of words picked at random with no fewer than min and
      * no more than max words.
      */
@@ -361,7 +369,6 @@ public class ExportGenerator
             if (!dir.mkdirs()) {
                 throw new RuntimeException("Failed to create directory \"" + dir.getAbsolutePath() + "\"");
             }
-            ;
         }
         return dir;
     }
