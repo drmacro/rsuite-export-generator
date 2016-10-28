@@ -5,11 +5,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.util.ArrayList;
-import java.util.Properties;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -159,19 +159,177 @@ public class ExportGenerator
 
     private void makeManagedObject(File moDir, int moid) throws Exception {
         File contentXml = new File(moDir, "content.xml");
+        String title = getRandomWords(2,5);
+        makeTopic(moid, contentXml, title);
+        ArrayList<String> versionSpecs = new ArrayList<String>();
+        int majorVer = 1;
+        int minorVer = 0;
+        int versionCount = ThreadLocalRandom.current().nextInt(0, generationParameters.getMaxVersions() + 1);
+        for (int i = 0; i < versionCount; i++) {
+            if (i > 0 && i % 3 == 0) {
+                majorVer++;
+                minorVer = 0;
+            }
+            String versionSpec = majorVer + "." + minorVer;
+            minorVer++;
+            versionSpecs.add(versionSpec);
+            File verFile = new File(moDir, moid + "-" + versionSpec + ".xml");
+            makeTopic(moid, verFile, title);
+        }
+        makeResourceFileForXmlMo(moDir, moid, title, versionSpecs);
+    }
+
+    private void makeResourceFileForXmlMo(File moDir,
+                                          int moid,
+                                          String title,
+                                          ArrayList<String> versionSpecs)
+            throws Exception {
+        String userName = "fakeexportuser";
+
+        File resourceFile = new File(moDir, moid + ".resource");
+        FileOutputStream fos = new FileOutputStream(resourceFile);
         XMLStreamWriter writer = XMLOutputFactory.newInstance().
                 createXMLStreamWriter(new BufferedOutputStream(
-                        new FileOutputStream(contentXml)), "UTF-8");
-        writer.writeStartDocument();
-        writer.writeStartElement("topic");
-        writer.writeAttribute("id", "" + moid);
-        writer.writeStartElement("title");
-        writer.writeCharacters(getRandomWords(2,5));
+                        fos), "UTF-8");
+        try {
+            writer.writeStartDocument();
+            writer.writeStartElement("contentResource");
+            writer.writeStartElement("acl");
+            writer.writeStartElement("role");
+            writer.writeAttribute("name", "RSuiteAdministrator");
+            writer.writeCharacters("admin");
+            writer.writeEndElement();// role
+            writer.writeStartElement("role");
+            writer.writeAttribute("name", "RSuiteEditor");
+            writer.writeCharacters("edit,copy,delete");
+            writer.writeEndElement();// role
+            writer.writeStartElement("role");
+            writer.writeAttribute("name", "*");
+            writer.writeCharacters("list,view,reuse");
+            writer.writeEndElement();// role
+            writer.writeEndElement();// acl
+
+            writer.writeEmptyElement("aliases");
+
+            writer.writeStartElement("systemMetadata");
+            writer.writeStartElement("id");
+            writer.writeCharacters("" + moid);
+            writer.writeEndElement();// id
+            writer.writeStartElement("username");
+            writer.writeCharacters(userName);
+            writer.writeEndElement();// username
+            writer.writeEndElement(); // systemMetadata
+
+            writer.writeStartElement("versions");
+            String moTagName = "topid";
+            for (int i = 0; i < versionSpecs.size(); i++) {
+                makeVersionEntry(writer, title, versionSpecs.get(i), moTagName, userName);
+            }
+            writer.writeEndElement(); // versions
+
+            writer.writeEndElement(); // contentResource
+            writer.writeEndDocument();
+        } catch (Exception e) {
+            log.error("makeResourceFileForXmlMo(): " + e.getClass().getSimpleName() + " Writing resource file: " + e.getMessage());
+            throw e;
+        } finally {
+            writer.flush();
+            writer.close();
+            fos.close();
+        }
+
+    }
+
+    private void makeVersionEntry(XMLStreamWriter writer,
+                                  String title,
+                                  String versionSpec,
+                                  String moTagName,
+                                  String userName)
+            throws XMLStreamException, FileNotFoundException {
+        writer.writeStartElement("versionEntry");
+        writer.writeStartElement("displayName");
+        writer.writeCharacters(title);
         writer.writeEndElement();
+        writer.writeStartElement("dtCommitted");
+        // FIXME: Generate the date within some configured range.
+        writer.writeCharacters("2010-12-16T20:05:41.000Z");
         writer.writeEndElement();
-        writer.writeEndDocument();
-        writer.flush();
-        writer.close();
+        writer.writeStartElement("entryType");
+        writer.writeCharacters("2"); // FIXME: Need to find out what the entry types are so this is accurate.
+        writer.writeEndElement();
+        writer.writeStartElement("lmd");
+        writer.writeCharacters(""); // FIXME: Generate some LMD randomly
+        writer.writeEndElement();
+        writer.writeStartElement("localName");
+        writer.writeCharacters(moTagName);
+        writer.writeEndElement();
+        writer.writeStartElement("namespaceUri");
+        writer.writeCharacters(""); // No namespace for DITA.
+        writer.writeEndElement();
+        writer.writeStartElement("note");
+        writer.writeCharacters(getRandomWords(1, 4));
+        writer.writeEndElement();
+        writer.writeStartElement("revision");
+        writer.writeCharacters(versionSpec);
+        writer.writeEndElement();
+        writer.writeStartElement("transactionId");
+        writer.writeCharacters("0"); // This seems to always be 0
+        writer.writeEndElement();
+        writer.writeStartElement("userId");
+        writer.writeCharacters(userName);
+        writer.writeEndElement();
+        writer.writeEndElement(); // versionEntry
+
+    }
+
+    private void makeTopic(int moid, File resultFile, String title)
+            throws Exception {
+        FileOutputStream fos = new FileOutputStream(resultFile);
+        XMLStreamWriter writer = XMLOutputFactory.newInstance().
+                createXMLStreamWriter(new BufferedOutputStream(
+                        fos), "UTF-8");
+        try {
+            writer.writeStartDocument();
+            writer.writeStartElement("topic");
+            writer.writeNamespace("r", "http://www.rsuitecms.com/rsuite/ns/metadata");
+            writer.writeNamespace("ditaarch", "http://dita.oasis-open.org/architecture/2005/");
+            writer.writeAttribute("id", "topic-" + moid);
+            writer.writeAttribute("class", "- topic/topic ");
+            writer.writeAttribute("r", "http://www.rsuitecms.com/rsuite/ns/metadata", "rsuiteId", "" + moid);
+            writer.writeAttribute("ditaarch:DITAArchVersion","1.2");
+            writer.writeAttribute("domains", "(topic hi-d) (topic ut-d) (topic indexing-d) (topic hazard-d) (topic abbrev-d) (topic pr-d) (topic sw-d) (topic ui-d)");
+            // Title
+            writer.writeStartElement("title");
+            writer.writeAttribute("class", "- topic/title ");
+            writer.writeCharacters(title);
+            writer.writeEndElement();
+            // Body
+            writer.writeStartElement("body");
+            writer.writeAttribute("class", "- topic/body ");
+            makeParagraphs(writer);
+            writer.writeEndElement();
+            // End topic
+            writer.writeEndElement();
+            writer.writeEndDocument();
+        } catch (Exception e) {
+            log.error("makeTopic(): " + e.getClass().getSimpleName() + " Writing topic file: " + e.getMessage());
+            throw e;
+        } finally {
+            writer.flush();
+            writer.close();
+            fos.close();
+        }
+
+    }
+
+    private void makeParagraphs(XMLStreamWriter writer) throws XMLStreamException {
+        int paraCnt = ThreadLocalRandom.current().nextInt(1, 10);
+        for (int i = 0; i < paraCnt; i++) {
+            writer.writeStartElement("p");
+            writer.writeAttribute("class", "- topic/p ");
+            writer.writeCharacters(getRandomWords(7, 30));
+            writer.writeEndElement();
+        }
     }
 
     /**
@@ -199,7 +357,7 @@ public class ExportGenerator
         int dirNum = ThreadLocalRandom.current().nextInt(min, max+1);
         File dir = new File(parent, "" + dirNum + "");
         if (!dir.exists()) {
-            log.info("Making directory " + dir.getName());
+            // log.info("Making directory " + dir.getName());
             if (!dir.mkdirs()) {
                 throw new RuntimeException("Failed to create directory \"" + dir.getAbsolutePath() + "\"");
             }

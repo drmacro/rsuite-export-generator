@@ -12,6 +12,7 @@ public class GenerationParameters extends Properties {
 
     long maxXmlMOs = -1;
     long maxBinaryMOs = -1;
+    int maxVersions = -1;
 
     public GenerationParameters(File generationParameters) throws Exception {
         this.load(new FileInputStream(generationParameters));
@@ -46,5 +47,17 @@ public class GenerationParameters extends Properties {
             maxBinaryMOs = Integer.parseInt(temp);
         }
         return maxBinaryMOs;
+    }
+
+    public int getMaxVersions() {
+        if (this.maxVersions == -1) {
+            String temp = (String)get("maxVersions");
+            if (temp == null || "".equals(temp.trim())) {
+                temp = "3";
+            }
+            maxVersions = Integer.parseInt(temp);
+        }
+        return maxVersions;
+
     }
 }
