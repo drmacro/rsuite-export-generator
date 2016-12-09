@@ -1,7 +1,9 @@
 package com.rsicms.exportgenerator;
 
+import com.rsicms.exportgenerator.api.BrowseTreeGenerator;
 import com.rsicms.exportgenerator.api.ManagedObjectGenerator;
-import com.rsicms.exportgenerator.mogeneration.DitaManagedObjectGenerator;
+import com.rsicms.exportgenerator.generation.DefaultBrowseTreeGenerator;
+import com.rsicms.exportgenerator.generation.DitaManagedObjectGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -75,9 +77,12 @@ public class ExportGenerator
     public void generateExport() throws Exception {
         log.info("Starting export generation to directory \"" + outdir.getAbsolutePath() + "\"...");
 
-        ManagedObjectGenerator generator = new DitaManagedObjectGenerator(generationParameters);
+        ManagedObjectGenerator moGenerator = new DitaManagedObjectGenerator(generationParameters);
 
-        generator.generateManagedObjects();
+        moGenerator.generateManagedObjects();
+        BrowseTreeGenerator browseGenerator = new DefaultBrowseTreeGenerator(generationParameters);
+        browseGenerator.generateBrowseTree();
+
 
         log.info("Export generation done.");
     }

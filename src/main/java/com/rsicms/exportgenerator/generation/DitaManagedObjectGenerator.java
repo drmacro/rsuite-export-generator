@@ -1,7 +1,6 @@
-package com.rsicms.exportgenerator.mogeneration;
+package com.rsicms.exportgenerator.generation;
 
 import com.rsicms.exportgenerator.GenerationParameters;
-import com.rsicms.exportgenerator.api.MoType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -11,7 +10,6 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -76,7 +74,7 @@ public class DitaManagedObjectGenerator extends ManagedObjectGeneratorBase {
         for (int i = 0; i < paraCnt; i++) {
             writer.writeStartElement("p");
             writer.writeAttribute("class", "- topic/p ");
-            writer.writeCharacters(getRandomWords(7, 30));
+            writer.writeCharacters(GenerationHelper.getRandomWords(7, 30));
             writer.writeEndElement();
         }
     }

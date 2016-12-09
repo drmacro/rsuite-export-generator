@@ -1,14 +1,10 @@
-package com.rsicms.exportgenerator.mogeneration;
+package com.rsicms.exportgenerator.generation;
 
 import com.rsicms.exportgenerator.GenerationParameters;
-import com.rsicms.exportgenerator.api.ManagedObjectGenerator;
 import com.rsicms.exportgenerator.api.MoType;
-import com.sun.xml.internal.ws.developer.UsesJAXBContext;
 import org.junit.Test;
 
 import java.io.File;
-import java.lang.reflect.Array;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -36,7 +32,7 @@ public class TestManagedObjectGeneratorBase {
 
         GenerationParameters genParms = getGenerationParameters();
         int moid = 1;
-        genParms.addMo(moid, MoType.XML);
+        genParms.addMo(moid, MoType.XML, "Thing 1");
         ManagedObject mo = genParms.getManagedObject(moid);
         assertNotNull("Didn't get an MO back", mo);
         assertEquals("MO ID doesn't match", mo.getID(), moid);
@@ -51,7 +47,7 @@ public class TestManagedObjectGeneratorBase {
     public void testCreateManagedObject() throws Exception {
         GenerationParameters genParms = getGenerationParameters();
         DitaManagedObjectGenerator moGenerator = new DitaManagedObjectGenerator(genParms);
-        int moid = moGenerator.nextMoId();
+        int moid = genParms.getNextMoId();
         moGenerator.makeManagedObject(genParms.getOutputDirectory(), moid, MoType.XML);
         ManagedObject mo = genParms.getManagedObject(moid);
         assertNotNull(mo);

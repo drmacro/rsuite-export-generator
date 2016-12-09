@@ -1,7 +1,7 @@
 package com.rsicms.exportgenerator;
 
 import com.rsicms.exportgenerator.api.MoType;
-import com.rsicms.exportgenerator.mogeneration.ManagedObject;
+import com.rsicms.exportgenerator.generation.ManagedObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +11,8 @@ import java.util.*;
  * Created by ekimber on 10/27/16.
  */
 public class GenerationParameters extends Properties {
+
+    private int moid = 1000; // Start with MO 1000 so MO IDs look realistic.
 
     long maxXmlMOs = -1;
     long maxBinaryMOs = -1;
@@ -23,6 +25,12 @@ public class GenerationParameters extends Properties {
         this.load(new FileInputStream(generationParameters));
 
     }
+
+    public int getNextMoId() {
+        return moid++;
+    }
+
+
 
     public String getOutdir() {
         return (String)this.get("outdir");
@@ -66,8 +74,8 @@ public class GenerationParameters extends Properties {
 
     }
 
-    public void addMo(int moid, MoType moType) {
-        ManagedObject mo = new ManagedObject(moid, moType);
+    public ManagedObject addMo(int moid, MoType moType, String displayName) {
+        ManagedObject mo = new ManagedObject(moid, moType, displayName);
 
         this.mosById.put("" + moid, mo);
         ArrayList mosOfType = this.mosByType.get(moType);
@@ -76,7 +84,7 @@ public class GenerationParameters extends Properties {
             this.mosByType.put(moType, mosOfType);
         }
         mosOfType.add(mo);
-
+        return mo;
     }
 
     public ManagedObject getManagedObject(int moid) {
@@ -101,5 +109,36 @@ public class GenerationParameters extends Properties {
 
     public File getOutputDirectory() {
         return this.outputDirectory;
+    }
+
+    /**
+     * Get the max number of containers to have at any point in the browse tree.
+     * @return
+     */
+    public int getBrowseWidth() {
+        String propStr = this.getProperty("browseWidth", "10");
+        int propVal = Integer.parseInt(propStr);
+        return propVal;
+    }
+
+    /**
+     * Get the max depth of containers for any branch of the browse tree.
+     * @return
+     */
+    public int getBrowseDepth() {
+        String propStr = this.getProperty("browseDepth", "5");
+        int propVal = Integer.parseInt(propStr);
+        return propVal;
+    }
+
+    public int getMaxContainerChildren() {
+
+        String propStr = this.getProperty("maxContainerChildren", "100");
+        int propVal = Integer.parseInt(propStr);
+        return propVal;
+    }
+
+    public String getUser() {
+        return "fakeuser";
     }
 }

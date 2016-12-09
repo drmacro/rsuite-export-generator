@@ -10,8 +10,7 @@ public interface BrowseTreeGenerator {
 
     /**
      * Generate a browse tree as exported.
-     * @param generationParameter
      * @throws Exception
      */
-    public void generateBrowseTree(GenerationParameters generationParameter) throws Exception;
+    public void generateBrowseTree() throws Exception;
 }
