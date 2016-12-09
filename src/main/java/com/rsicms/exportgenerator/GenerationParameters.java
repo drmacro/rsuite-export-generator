@@ -1,9 +1,11 @@
 package com.rsicms.exportgenerator;
 
+import com.rsicms.exportgenerator.api.MoType;
+import com.rsicms.exportgenerator.mogeneration.ManagedObject;
+
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by ekimber on 10/27/16.
@@ -13,6 +15,9 @@ public class GenerationParameters extends Properties {
     long maxXmlMOs = -1;
     long maxBinaryMOs = -1;
     int maxVersions = -1;
+    private Map<String, ManagedObject> mosById = new HashMap<String, ManagedObject>();
+    private Map<MoType, ArrayList> mosByType = new HashMap<MoType, ArrayList>();
+    private File outputDirectory;
 
     public GenerationParameters(File generationParameters) throws Exception {
         this.load(new FileInputStream(generationParameters));
@@ -59,5 +64,42 @@ public class GenerationParameters extends Properties {
         }
         return maxVersions;
 
+    }
+
+    public void addMo(int moid, MoType moType) {
+        ManagedObject mo = new ManagedObject(moid, moType);
+
+        this.mosById.put("" + moid, mo);
+        ArrayList mosOfType = this.mosByType.get(moType);
+        if (null == mosOfType) {
+            mosOfType = new ArrayList<ManagedObject>();
+            this.mosByType.put(moType, mosOfType);
+        }
+        mosOfType.add(mo);
+
+    }
+
+    public ManagedObject getManagedObject(int moid) {
+        ManagedObject mo = this.mosById.get("" + moid);
+        return mo;
+    }
+
+    public ArrayList<ManagedObject> getManagedObjectsOfType(MoType moType) {
+        return this.mosByType.get(moType);
+    }
+
+    /**
+     * Set the output directory file. This will usually have
+     * been created from the value in the properties file.
+     * Note that this is different from the "outdir" property
+     * in the configuration file.
+     * @param outputDirectory
+     */
+    public void setOutputDirectory(File outputDirectory) {
+        this.outputDirectory = outputDirectory;
+    }
+
+    public File getOutputDirectory() {
+        return this.outputDirectory;
     }
 }

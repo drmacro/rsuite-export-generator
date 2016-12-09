@@ -1,6 +1,7 @@
 package com.rsicms.exportgenerator.mogeneration;
 
 import com.rsicms.exportgenerator.GenerationParameters;
+import com.rsicms.exportgenerator.api.MoType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -20,8 +21,8 @@ public class DitaManagedObjectGenerator extends ManagedObjectGeneratorBase {
 
     private static Log log = LogFactory.getLog(DitaManagedObjectGenerator.class);
 
-    public DitaManagedObjectGenerator(File outdir, GenerationParameters generationParameters) {
-        super(outdir, generationParameters);
+    public DitaManagedObjectGenerator(GenerationParameters generationParameters) {
+        super(generationParameters);
     }
 
     public void generateManagedObjects() throws Exception {
@@ -45,7 +46,8 @@ public class DitaManagedObjectGenerator extends ManagedObjectGeneratorBase {
          * a breadth-first traversal of the directories, rather than a depth-first.
          */
 
-        File contentDir = new File(outdir, "rsuite.content");
+        File contentDir = new File(generationParameters.getOutputDirectory(),
+                "rsuite.content");
         File mosDir = new File(contentDir, "managed-objects");
         if (!mosDir.mkdirs()) {
             throw new RuntimeException("Failed to create directory \"" + mosDir.getAbsolutePath() + "\"");
@@ -63,7 +65,7 @@ public class DitaManagedObjectGenerator extends ManagedObjectGeneratorBase {
                 throw new RuntimeException("Failed to create directory \"" + moDir.getAbsolutePath() + "\"");
             }
 
-            makeManagedObject(moDir, moid);
+            makeManagedObject(moDir, moid, MoType.XML);
 
             progressCtr++;
             if (progressCtr % 100 == 0) {
@@ -80,7 +82,7 @@ public class DitaManagedObjectGenerator extends ManagedObjectGeneratorBase {
 
     }
 
-    public void makeManagedObject(File moDir, int moid) throws Exception {
+    protected void makeManagedObject(File moDir, int moid, MoType moType) throws Exception {
         File contentXml = new File(moDir, "content.xml");
         String title = getRandomWords(2,5);
         makeTopic(moid, contentXml, title);
@@ -100,6 +102,7 @@ public class DitaManagedObjectGenerator extends ManagedObjectGeneratorBase {
             makeTopic(moid, verFile, title);
         }
         makeResourceFileForXmlMo(moDir, moid, title, versionSpecs);
+        this.generationParameters.addMo(moid, moType);
     }
 
 

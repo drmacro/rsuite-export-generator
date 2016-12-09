@@ -36,6 +36,7 @@ public class ExportGenerator
             throw new RuntimeException("Failed to create output directory \"" + outdir.getAbsolutePath() + "\"");
         }
         this.outdir = outdir;
+        generationParameters.setOutputDirectory(outdir);
     }
 
     public static void main(String[] args )
@@ -74,7 +75,7 @@ public class ExportGenerator
     public void generateExport() throws Exception {
         log.info("Starting export generation to directory \"" + outdir.getAbsolutePath() + "\"...");
 
-        ManagedObjectGenerator generator = new DitaManagedObjectGenerator(outdir, generationParameters);
+        ManagedObjectGenerator generator = new DitaManagedObjectGenerator(generationParameters);
 
         generator.generateManagedObjects();
 

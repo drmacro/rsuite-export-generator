@@ -23,7 +23,6 @@ public abstract class ManagedObjectGeneratorBase implements ManagedObjectGenerat
     // FIXME: The initial MOID should probably bet part of the generation parameter as should the output directory.
 
     protected final GenerationParameters generationParameters;
-    protected final File outdir;
 
     protected int moid = 1000; // Start with MO 1000 so MO IDs look realistic.
 
@@ -53,8 +52,7 @@ public abstract class ManagedObjectGeneratorBase implements ManagedObjectGenerat
     }
 
 
-    public ManagedObjectGeneratorBase(File outdir, GenerationParameters generationParameters) {
-        this.outdir = outdir;
+    public ManagedObjectGeneratorBase(GenerationParameters generationParameters) {
         this.generationParameters = generationParameters;
     }
 
@@ -133,7 +131,7 @@ public abstract class ManagedObjectGeneratorBase implements ManagedObjectGenerat
         return dir;
     }
 
-    public void makeResourceFileForXmlMo(File moDir,
+    protected void makeResourceFileForXmlMo(File moDir,
                                           int moid,
                                           String title,
                                           ArrayList<String> versionSpecs)
