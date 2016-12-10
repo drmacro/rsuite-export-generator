@@ -13,6 +13,8 @@ import java.util.*;
 public class GenerationParameters extends Properties {
 
     private int moid = 1000; // Start with MO 1000 so MO IDs look realistic.
+    private int progressCtr = 0;
+    private int dotCtr = 0;
 
     long maxXmlMOs = -1;
     long maxBinaryMOs = -1;
@@ -27,6 +29,19 @@ public class GenerationParameters extends Properties {
     }
 
     public int getNextMoId() {
+        // Show progress as MO IDs are consumed.
+        // This will have the effect of showing the
+        // progress as things are constructed.
+        progressCtr++;
+        if (progressCtr % 100 == 0) {
+            System.out.print(".");
+            dotCtr++;
+            if (dotCtr >= 60) {
+                System.out.print("\n");
+                dotCtr = 0;
+            }
+        }
+
         return moid++;
     }
 

@@ -23,8 +23,8 @@ public class ExportGenerator
     private final File outdir;
 
 
-    public ExportGenerator(File parametersFilepath) throws Exception {
-        this.generationParameters = new GenerationParameters(parametersFilepath);
+    public ExportGenerator(File parametersFile) throws Exception {
+        this.generationParameters = new GenerationParameters(parametersFile);
 
         String outdirPath = generationParameters.getOutdir();
         if (outdirPath == null || "".equals(outdirPath.trim())) {
@@ -85,6 +85,10 @@ public class ExportGenerator
 
 
         log.info("Export generation done.");
+    }
+
+    public GenerationParameters getGenerationParameters() {
+        return this.generationParameters;
     }
 
 }

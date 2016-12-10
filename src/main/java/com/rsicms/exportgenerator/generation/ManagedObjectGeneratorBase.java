@@ -76,9 +76,7 @@ public abstract class ManagedObjectGeneratorBase implements ManagedObjectGenerat
         if (!mosDir.mkdirs()) {
             throw new RuntimeException("Failed to create directory \"" + mosDir.getAbsolutePath() + "\"");
         }
-
-        long progressCtr = 0;
-        long dotCtr = 0;
+        System.out.print("Managed Objects: ");
         // First make the top 100 directories.
         for (long i = 0; i < generationParameters.getMaxMoCount(); i++) {
             File topDir = getRandomDir(0, 999, mosDir);
@@ -91,17 +89,7 @@ public abstract class ManagedObjectGeneratorBase implements ManagedObjectGenerat
 
             makeManagedObject(moDir, moid, MoType.XML);
 
-            progressCtr++;
-            if (progressCtr % 100 == 0) {
-                System.out.print(".");
-                dotCtr++;
-                if (dotCtr >= 60) {
-                    System.out.print("\n");
-                    dotCtr = 0;
-                }
-            }
         }
-        System.out.print("\n");
 
 
     }

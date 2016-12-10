@@ -1,7 +1,9 @@
 package com.rsicms.exportgenerator.generation;
 
+import com.rsicms.exportgenerator.ExportGenerator;
 import com.rsicms.exportgenerator.GenerationParameters;
 import com.rsicms.exportgenerator.api.MoType;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -17,14 +19,18 @@ import static org.junit.Assert.assertNotNull;
 public class TestManagedObjectGeneratorBase {
 
     private GenerationParameters getGenerationParameters() throws Exception {
-        URL props = TestManagedObjectGeneratorBase.class.getResource("/generation.properties");
-        assertNotNull("Didn't get props file", props);
-        File propsFile = new File(props.getFile());
+        File propsFile = getPropsFile();
         GenerationParameters genParms = new GenerationParameters(propsFile);
         File tempFile = File.createTempFile("rsi-", ".xml");
         File outDir = tempFile.getParentFile();
         genParms.setOutputDirectory(outDir);
         return genParms;
+    }
+
+    private File getPropsFile() {
+        URL props = TestManagedObjectGeneratorBase.class.getResource("/tiny-generation.properties");
+        assertNotNull("Didn't get props file", props);
+        return new File(props.getFile());
     }
 
     @Test
@@ -52,5 +58,18 @@ public class TestManagedObjectGeneratorBase {
         ManagedObject mo = genParms.getManagedObject(moid);
         assertNotNull(mo);
         genParms.getOutputDirectory().delete();
+    }
+
+    @Test
+    public void testExportGenerator() throws Exception {
+
+        ExportGenerator exporter = new ExportGenerator(getPropsFile());
+        GenerationParameters genParms = exporter.getGenerationParameters();
+        File outputDir = genParms.getOutputDirectory();
+        if (outputDir.exists()) {
+            FileUtils.deleteDirectory(outputDir);
+        }
+        exporter.generateExport();
+
     }
 }

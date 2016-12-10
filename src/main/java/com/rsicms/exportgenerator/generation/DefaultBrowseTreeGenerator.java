@@ -33,6 +33,7 @@ public class DefaultBrowseTreeGenerator implements BrowseTreeGenerator {
 
     public void generateBrowseTree() throws Exception {
 
+        System.out.print("\nBrowse tree: ");
         int depth = 0;
         File outDir = new File(generationParameters.getOutputDirectory(), "rsuite.content");
         ManagedObject root = new ManagedObject(4, MoType.CA, "/");
@@ -50,6 +51,7 @@ public class DefaultBrowseTreeGenerator implements BrowseTreeGenerator {
             containers.add(makeContainer(depth + 1, outDir));
         }
         // Now write the rsuite.node file for the root container.
+
         makeRSuiteNodeFile(outDir, parent, containers);
     }
 
@@ -96,12 +98,17 @@ public class DefaultBrowseTreeGenerator implements BrowseTreeGenerator {
 
 
         } catch (Exception e) {
-
+            throw e;
+        } finally {
+            writer.flush();
+            writer.close();
+            fos.close();
         }
 
     }
 
     private ManagedObject makeContainer(int depth, File outDir) throws Exception {
+
         String containerName = GenerationHelper.getRandomWords(1, 4);
         ManagedObject container =
                 new ManagedObject(generationParameters.getNextMoId(),
@@ -119,7 +126,7 @@ public class DefaultBrowseTreeGenerator implements BrowseTreeGenerator {
         ArrayList<ManagedObject> xmlMos = generationParameters.getManagedObjectsOfType(MoType.XML);
 
         for (int i = 0; i < numChildren; i++) {
-            int p = ThreadLocalRandom.current().nextInt(0, xmlMos.size()+1);
+            int p = ThreadLocalRandom.current().nextInt(0, xmlMos.size());
             children.add(xmlMos.get(p));
         }
 
