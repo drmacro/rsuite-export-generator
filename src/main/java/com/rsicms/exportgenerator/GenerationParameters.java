@@ -163,4 +163,20 @@ public class GenerationParameters extends Properties {
     public String getUser() {
         return "fakeuser";
     }
+
+    /**
+     * Create a new managed object of the specified type and with the
+     * specified display name.
+     * @param moType
+     * @param displayName
+     * @return
+     */
+    public ManagedObject newMo(MoType moType, String displayName) {
+        ManagedObject result = addMo(getNextMoId(), moType, displayName);
+        return result;
+    }
+
+    public int getManagedObjectCount() {
+        return this.mosById.size();
+    }
 }

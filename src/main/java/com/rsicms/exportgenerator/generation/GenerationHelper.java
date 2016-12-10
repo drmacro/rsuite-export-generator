@@ -69,9 +69,11 @@ public class GenerationHelper {
                                     String userName)
             throws XMLStreamException, FileNotFoundException {
         writer.writeStartElement("versionEntry");
-        writer.writeStartElement("displayName");
-        writer.writeCharacters(title);
-        writer.writeEndElement();
+        if (null != title) {
+            writer.writeStartElement("displayName");
+            writer.writeCharacters(title);
+            writer.writeEndElement();
+        }
         writer.writeStartElement("dtCommitted");
         // FIXME: Generate the date within some configured range.
         writer.writeCharacters("2010-12-16T20:05:41.000Z");

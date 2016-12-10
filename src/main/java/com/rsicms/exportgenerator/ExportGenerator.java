@@ -91,6 +91,7 @@ public class ExportGenerator
         writeIdsXml(generationParameters);
 
         System.out.println("Generation summary:");
+        System.out.println("    Total MOs: " + generationParameters.getManagedObjectCount());
         System.out.println("      XML MOs: " + generationParameters.getManagedObjectsOfType(MoType.XML).size());
         System.out.println("  Non-XML MOs: " + generationParameters.getManagedObjectsOfType(MoType.NONXML).size());
         System.out.println("          CAs: " + generationParameters.getManagedObjectsOfType(MoType.CA).size());

@@ -110,11 +110,7 @@ public class DefaultBrowseTreeGenerator implements BrowseTreeGenerator {
     private ManagedObject makeContainer(int depth, File outDir) throws Exception {
 
         String containerName = GenerationHelper.getRandomWords(1, 4);
-        ManagedObject container =
-                new ManagedObject(generationParameters.getNextMoId(),
-                                  MoType.CA,
-                                  containerName);
-
+        ManagedObject container = generationParameters.newMo(MoType.CA, containerName);
         File containerDir = new File(outDir, containerName);
         if (!containerDir.mkdirs()) {
             throw new RuntimeException("Failed to create output directory " +
@@ -174,7 +170,7 @@ public class DefaultBrowseTreeGenerator implements BrowseTreeGenerator {
             writer.writeAttribute("r:rsuiteId", "" + container.getID());
 
             for (ManagedObject child : children) {
-                ManagedObject moref = new ManagedObject(generationParameters.getNextMoId(), MoType.MOREF, "");
+                ManagedObject moref = generationParameters.newMo(MoType.MOREF, null);
                 writer.writeEmptyElement("moref");
                 writer.writeAttribute("r:rsuiteId", "" + moref.getID());
                 writer.writeAttribute("class", "+ map/topicref rs_ca-d/rs_moref ");
