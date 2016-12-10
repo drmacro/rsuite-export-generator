@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Test the general managed object generator API
  */
-public class TestManagedObjectGeneratorBase {
+public class TestExportGenerator {
 
     private GenerationParameters getGenerationParameters() throws Exception {
         File propsFile = getPropsFile();
@@ -28,7 +28,7 @@ public class TestManagedObjectGeneratorBase {
     }
 
     private File getPropsFile() {
-        URL props = TestManagedObjectGeneratorBase.class.getResource("/tiny-generation.properties");
+        URL props = TestExportGenerator.class.getResource("/tiny-generation.properties");
         assertNotNull("Didn't get props file", props);
         return new File(props.getFile());
     }

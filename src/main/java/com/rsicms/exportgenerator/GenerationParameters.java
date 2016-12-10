@@ -25,6 +25,7 @@ public class GenerationParameters extends Properties {
 
     public GenerationParameters(File generationParameters) throws Exception {
         this.load(new FileInputStream(generationParameters));
+        // Initialize each of the type arrays:
 
     }
 
@@ -108,7 +109,13 @@ public class GenerationParameters extends Properties {
     }
 
     public ArrayList<ManagedObject> getManagedObjectsOfType(MoType moType) {
-        return this.mosByType.get(moType);
+        ArrayList<ManagedObject> resultArray = this.mosByType.get(moType);
+        if (null == resultArray) {
+            resultArray = new ArrayList<ManagedObject>();
+            this.mosByType.put(moType, resultArray);
+        }
+
+        return resultArray;
     }
 
     /**

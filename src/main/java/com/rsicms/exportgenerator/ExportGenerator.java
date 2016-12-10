@@ -2,11 +2,14 @@ package com.rsicms.exportgenerator;
 
 import com.rsicms.exportgenerator.api.BrowseTreeGenerator;
 import com.rsicms.exportgenerator.api.ManagedObjectGenerator;
+import com.rsicms.exportgenerator.api.MoType;
 import com.rsicms.exportgenerator.generation.DefaultBrowseTreeGenerator;
 import com.rsicms.exportgenerator.generation.DitaManagedObjectGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.*;
 import java.nio.file.FileSystems;
 
@@ -83,8 +86,39 @@ public class ExportGenerator
         BrowseTreeGenerator browseGenerator = new DefaultBrowseTreeGenerator(generationParameters);
         browseGenerator.generateBrowseTree();
 
+        // Now write the ids.xml file:
+
+        writeIdsXml(generationParameters);
+
+        System.out.println("Generation summary:");
+        System.out.println("      XML MOs: " + generationParameters.getManagedObjectsOfType(MoType.XML).size());
+        System.out.println("  Non-XML MOs: " + generationParameters.getManagedObjectsOfType(MoType.NONXML).size());
+        System.out.println("          CAs: " + generationParameters.getManagedObjectsOfType(MoType.CA).size());
+        System.out.println("       MORefs: " + generationParameters.getManagedObjectsOfType(MoType.MOREF).size());
+
 
         log.info("Export generation done.");
+    }
+
+    private void writeIdsXml(GenerationParameters generationParameters) throws Exception {
+        File resultFile = new File(generationParameters.getOutputDirectory(), "ids.xml");
+        FileOutputStream fos = new FileOutputStream(resultFile);
+        XMLStreamWriter writer = XMLOutputFactory.newInstance().
+                createXMLStreamWriter(new BufferedOutputStream(
+                        fos), "UTF-8");
+        try {
+            writer.writeStartDocument();
+            writer.writeStartElement("ids");
+            writer.writeCharacters("" + generationParameters.getNextMoId());
+            writer.writeEndElement();
+        } catch (Exception e) {
+            log.error("makeResourceFileForXmlMo(): " + e.getClass().getSimpleName() + " Writing ids.xml file: " + e.getMessage());
+            throw e;
+        } finally {
+            writer.flush();
+            writer.close();
+            fos.close();
+        }
     }
 
     public GenerationParameters getGenerationParameters() {
