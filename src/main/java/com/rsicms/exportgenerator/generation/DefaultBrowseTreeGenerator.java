@@ -130,9 +130,11 @@ public class DefaultBrowseTreeGenerator implements BrowseTreeGenerator {
             children.add(xmlMos.get(p));
         }
 
-        int numChildContainers = ThreadLocalRandom.current().nextInt(0, browseWidth+1);
-        for (int i = 0; i < numChildContainers; i++) {
-            children.add(makeContainer(depth + 1, containerDir));
+        if (depth < generationParameters.getBrowseDepth()) {
+            int numChildContainers = ThreadLocalRandom.current().nextInt(0, browseWidth + 1);
+            for (int i = 0; i < numChildContainers; i++) {
+                children.add(makeContainer(depth + 1, containerDir));
+            }
         }
 
         makeContainerDoc(container, children, containerDir);
@@ -153,7 +155,7 @@ public class DefaultBrowseTreeGenerator implements BrowseTreeGenerator {
                                   File outDir)
                                                     throws Exception
     {
-        File resultFile = new File(outDir, container.getID() + ".resource");
+        File resultFile = new File(outDir, container.getID() + ".xml");
         FileOutputStream fos = new FileOutputStream(resultFile);
         XMLStreamWriter writer = XMLOutputFactory.newInstance().
                 createXMLStreamWriter(new BufferedOutputStream(
@@ -188,8 +190,17 @@ public class DefaultBrowseTreeGenerator implements BrowseTreeGenerator {
             writer.writeEndElement(); // rs_ca_map
             writer.writeEndDocument();
         } catch (Exception e) {
-
+            throw e;
+        } finally {
+            writer.flush();
+            writer.close();
+            fos.close();
         }
+
+        ArrayList<String> versionSpecs = new ArrayList<String>();
+        versionSpecs.add("1.0");
+
+        GenerationHelper.makeResourceFileForMo(outDir, container, versionSpecs);
 
     }
 }
